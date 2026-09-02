@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Repository;
-class Database
+final class Database
 {
    
     private static ?Database $connection = null;
@@ -26,11 +26,11 @@ class Database
         if (self::$connection === null) {
             self::$connection = new Database();
         }
-
+        
         return self::$connection;
     }
 
-      private  function getConnexion(): \PDO
+    public  function getConnexion(): \PDO
     {
         if ($this->pdo === null) {
             try {

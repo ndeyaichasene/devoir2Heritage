@@ -141,3 +141,89 @@ On l'utilise notamment parce qu'il permet :
 * de protéger les requêtes contre les injections SQL ;
 * de gérer les erreurs avec des exceptions ;
 * d'avoir une interface orientée objet pour accéder à la base.
+
+### PARTIE 4
+
+# 1. Pourquoi créer un objet supplémentaire alors que $_POST contient déjà les données ?
+
+Parce que $_POST contient des données brutes provenant du navigateur, principalement sous forme de chaînes.
+
+Le DTO permet de :
+
+* contrôler les données reçues ;
+* convertir les types ;
+* centraliser la validation ;
+* éviter que $_POST entre directement dans le métier.
+
+On obtient donc: 
+
+$_POST
+   ↓
+SoumettreCopieDTO
+   ↓
+Service
+   ↓
+CopieExamen
+
+
+# 2.Quelle différence entre SoumettreCopieDTO et CopieExamen ?
+
+DTO : transporte les données entre les couches.
+
+Entité CopieExamen : représente réellement une copie dans ton domaine métier.
+
+Par exemple :SoumettreCopieDTO
+            → données reçues du formulaire
+
+            CopieExamen
+            → objet métier représentant une copie d'examen
+Le DTO n'a donc pas vocation à remplacer ton entité.
+
+# 3. Le DTO doit-il posséder un identifiant de base de données ?
+
+Non.
+
+L'identifiant appartient à l'entité persistée, pas aux données nécessaires à la soumission.
+
+Donc :SoumettreCopieDTO
+        - noteBrute
+        - dateDepot
+        - dateLimite 
+    pas besoin de id
+
+# 4. Où convertir les chaînes de dates ?
+
+La conversion des données du formulaire vers les types métier attendus est une responsabilité adaptée au DTO.
+
+Par exemple :"2026-09-02"
+                ↓
+            DateTime
+
+Ainsi, ton Service ne reçoit plus une chaîne venant de $_POST, mais une vraie date.
+
+# 5. Flux complet de la Partie 4
+
+Tu dois viser cette architecture :
+Formulaire HTML
+       │
+       │ $_POST
+       ▼
+   Controller
+       │
+       │ création du DTO
+       ▼
+SoumettreCopieDTO
+       │
+       │ données typées et validées
+       ▼
+     Service
+       │
+       │ logique métier
+       ▼
+  CopieExamen
+       │
+       ▼
+   Repository
+       │
+       ▼
+   PostgreSQL

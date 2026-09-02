@@ -2,16 +2,12 @@
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
+use App\config\Bootstrap;
 use App\Repository\Database;
-use Dotenv\Dotenv;
 
+$bootstrap = new Bootstrap();
 
-$dotenv = Dotenv::createImmutable(dirname(__DIR__));
-$dotenv->load();
+$database = Database::getInstance();
+$database->getConnexion();
 
-$db = Database::getInstance();
-
-// echo "<pre>";
-//     var_dump($db->getAllData('copies'));
-// echo "</pre>";
-
+echo "Connecté à la base de données !";

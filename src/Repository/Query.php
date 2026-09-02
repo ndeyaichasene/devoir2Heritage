@@ -1,15 +1,17 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Repository;
 
 
-abstract class Query{
+abstract class Query
+{
     private \PDO $pdo;
-    
+
     protected function  __construct(\PDO $pdo)
     {
-        $this->pdo = $pdo ;
+        $this->pdo = $pdo;
     }
 
     protected function query(string $sql, bool $single = true): mixed
@@ -19,16 +21,17 @@ abstract class Query{
         return $single ? $query->fetch(\PDO::FETCH_OBJ) : $query->fetchAll(\PDO::FETCH_OBJ);
     }
 
-   protected function prepare(string $sql, array $datas): \PDOStatement
-{
-    $statement = $this->pdo->prepare($sql);
+    protected function prepare(string $sql, array $datas): \PDOStatement
+    {
+        $statement = $this->pdo->prepare($sql);
 
-    $statement->execute($datas);
+        $statement->execute($datas);
 
-    return $statement;
-}
+        return $statement;
+    }
 
-    protected function executeQuery(string $sql,array $datas,bool $single = true): mixed {
+    protected function executeQuery(string $sql, array $datas, bool $single = true): mixed
+    {
         $statement = $this->prepare($sql, $datas);
 
         return $single ? $statement->fetch(\PDO::FETCH_OBJ) : $statement->fetchAll(\PDO::FETCH_OBJ);
@@ -47,7 +50,4 @@ abstract class Query{
 
         return $this->query($sql, false);
     }
-
-    
-    
 }

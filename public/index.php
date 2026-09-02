@@ -1,0 +1,17 @@
+<?php
+
+require_once dirname(__DIR__) . '/vendor/autoload.php';
+
+use App\Repository\Database;
+use Dotenv\Dotenv;
+
+
+$dotenv = Dotenv::createImmutable(dirname(__DIR__));
+$dotenv->load();
+
+$db = Database::getInstance();
+
+// echo "<pre>";
+//     var_dump($db->getAllData('copies'));
+// echo "</pre>";
+

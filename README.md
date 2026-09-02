@@ -102,3 +102,42 @@ L’identifiant peut être null avant la sauvegarde parce qu’il peut être gé
 L’encapsulation permet de protéger l’état interne de l’objet et d’empêcher des modifications directes et invalides.
 
 Par exemple, la note ne peut pas être directement modifiée à 25, car elle passe par une méthode qui vérifie qu’elle est comprise entre 0 et 20.
+
+### PARTIE 3
+# 1. Quelle classe doit être responsable de la connexion ?
+
+C'est la classe Database.
+Elle est responsable de créer et gérer la connexion à PostgreSQL avec PDO.
+ex : Repository → Database → PDO → PostgreSQL
+
+# 2. Faut-il créer une nouvelle connexion pour chaque requête SQL ?
+
+Non.
+On crée une connexion une seule fois et on la réutilise pour les différentes requêtes SQL.
+C'est justement ce que permet le Singleton avec :Database::getInstance();
+Cela évite de recréer inutilement une connexion à chaque requête.
+
+# 3. Où placer les identifiants de connexion ?
+
+Les identifiants (DB_HOST, DB_NAME, DB_USER, DB_PASSWORD, etc.) doivent être placés dans un fichier .env, qui ne doit pas être versionné.
+
+Exemple :   DB_HOST=localhost
+            DB_PORT=5432
+            DB_NAME=heritage_devoir2
+            DB_USER=pos
+            DB_PASSWORD=pwd
+
+et mettre .env dans .gitignore
+Ainsi, les informations sensibles ne sont pas directement écrites dans Database.php.
+
+# 4. Pourquoi utiliser PDO ?
+
+PDO (PHP Data Objects) permet à PHP de communiquer avec une base de données.
+
+On l'utilise notamment parce qu'il permet :
+
+* de se connecter à PostgreSQL ;
+* d'utiliser des requêtes préparées ;
+* de protéger les requêtes contre les injections SQL ;
+* de gérer les erreurs avec des exceptions ;
+* d'avoir une interface orientée objet pour accéder à la base.

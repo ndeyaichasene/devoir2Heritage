@@ -4,8 +4,7 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "App\\": "src/",
-            "App\\config\\": "config/"
+            "App\\": "src/"
         }
     },
     "authors": [
@@ -14,5 +13,7 @@
             "email": "ndeyaichasene@gmail.com"
         }
     ],
-    "require": {}
+    "require": {
+        "vlucas/phpdotenv": "^5.7"
+    }
 }

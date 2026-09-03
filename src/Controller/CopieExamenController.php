@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\DTO\SoumettreCopieDTO;
 use App\Repository\CopieExamenRepositoryInterface;
 use App\Service\SoumissionCopieService;
 
@@ -18,6 +19,15 @@ class CopieExamenController
             'errors' => $errors,
             'old' => $old
         ]);
+    }
+
+    public function store(): void
+    {
+        $dto = SoumettreCopieDTO::fromArray($_POST);
+        $this->service->soumettre($dto);
+
+        header('Location: /copies');
+        exit;
     }
 
     private function render(string $view, array $data = []): void

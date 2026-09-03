@@ -25,7 +25,7 @@ class SoumissionCopieService
             $dateLimite
         );
 
-        $penaliteAppliquee = $dateDepot > $dateLimite;
+        $penaliteAppliquee = $noteFinale < $noteBrute;
 
         $copieExamen = new CopieExamen(
             noteBrute: $noteBrute,

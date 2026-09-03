@@ -26,10 +26,21 @@ class PdoCopieExamenRepository extends Query implements CopieExamenRepositoryInt
         $this->executeUpdate($sql,$params);
     }
     public function findAll():array{
-    return [];
+
+        $query = $this->getAllData('copies');
+        $copieExamens = array_map(fn($copieExamen) =>CopieExamen::toEntity($copieExamen),$query );
+        return $copieExamens;
+
     }
     public function findById(int $id):?CopieExamen{
-        return null;
+
+        $prepare = $this->getById('copies',$id);
+
+        if ($prepare === null) {
+            return null;
+        }
+        $copieExamen = CopieExamen::toEntity($prepare);
+        return $copieExamen;
 
     }
 

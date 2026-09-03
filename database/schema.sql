@@ -8,12 +8,7 @@ CREATE TABLE copies(
     dateLimite TIMESTAMP NOT NULL
 );
 
-INSERT INTO copies (
-    dateDepot,
-    noteBrute,
-    noteFinale,
-    penaliteAppliquee,
-    dateLimite
+INSERT INTO copies (dateDepot, noteBrute, noteFinale, penaliteAppliquee, dateLimite
 )
 VALUES (
     CURRENT_TIMESTAMP,

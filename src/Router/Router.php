@@ -31,4 +31,33 @@ class Router
     {
         return $this->routes;
     }
+
+    public function dispatch(string $method, string $uri): mixed
+    {
+        $parsedPath = parse_url($uri, PHP_URL_PATH);
+        $requestPath = '/' . trim($parsedPath, '/');
+        $requestMethod = strtoupper($method);
+
+        foreach ($this->routes as $route) {
+            if ($route['method'] === $requestMethod && $route['path'] === $requestPath) {
+                return $this->executeHandler($route['handler']);
+            }
+        }
+
+        return null;
+    }
+
+    protected function executeHandler(callable|array $handler, array $params = []): mixed
+    {
+        if (is_callable($handler)) {
+            return call_user_func_array($handler, $params);
+        }
+
+        if (is_array($handler) && count($handler) === 2) {
+            [$controller, $action] = $handler;
+            return call_user_func_array([$controller, $action], $params);
+        }
+
+        throw new \InvalidArgumentException("Le gestionnaire de route n'est pas exécutable.");
+    }
 }

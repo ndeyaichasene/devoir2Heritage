@@ -227,3 +227,71 @@ SoumettreCopieDTO
        │
        ▼
    PostgreSQL
+### PARTIE 5 — Stratégie de calcul des notes
+
+# 1. Quel patron de conception est utilisé pour le calcul des notes ?
+Le patron de conception utilisé est le patron **Strategy** (Stratégie).
+Il repose sur une interface commune `CalculNoteInterface` et une implémentation concrète `CalculNoteAvecRetardService`.
+
+# 2. Quels sont les avantages de ce patron ?
+* **Interchangeabilité :** On peut changer d'algorithme de calcul de pénalité (par exemple, une pénalité progressive par jour de retard) sans modifier le reste de l'application.
+* **Principe Open/Closed (OCP) :** Le code est ouvert à l'extension (création de nouvelles stratégies) et fermé à la modification.
+* **Testabilité :** La stratégie peut être testée isolément sans dépendance au serveur ou à la base de données.
+
+### PARTIE 6 — Repository (Persistance des données)
+
+# 1. Quel est le rôle du Repository ?
+Le Repository (`CopieExamenRepositoryInterface`, `PdoCopieExamenRepository`) isole la couche de persistance de la couche métier.
+Il encapsule l'exécution des requêtes SQL (`SELECT`, `INSERT`), prépare les déclarations pour éviter les injections SQL et transforme les lignes de la base en objets entités `CopieExamen`.
+
+# 2. Pourquoi le Repository ne calcule-t-il pas la note ?
+En vertu du **Principe de Responsabilité Unique (SRP)**, le rôle du Repository est uniquement de lire et d'écrire des données dans la base. Le calcul de la note relève de la logique métier et doit donc être confié aux services dédiés.
+
+### PARTIE 7 — Service applicatif
+
+# 1. Quel est le rôle de SoumissionCopieService ?
+`SoumissionCopieService` est un service d'orchestration applicative :
+1. Il reçoit les données validées via le DTO `SoumettreCopieDTO`.
+2. Il applique la stratégie de calcul `CalculNoteInterface` pour déterminer la note finale et la pénalité.
+3. Il instancie l'entité `CopieExamen`.
+4. Il sauvegarde la copie en base via le Repository `CopieExamenRepositoryInterface`.
+5. Il retourne l'entité persistée.
+
+Il ne dépend ni de `$_POST`, ni de requêtes SQL brutes, ni d'une vue HTML.
+
+### PARTIE 8 — Vues MVC
+
+# Organisation des vues
+Les vues sont situées dans le dossier `template/` :
+* `template/layout/header.php` et `footer.php` : structure HTML commune et feuille de styles responsive.
+* `template/copies/create.php` : formulaire de soumission avec réaffichage des erreurs de validation et des anciennes valeurs.
+* `template/copies/index.php` : tableau listant les copies d'examen enregistrées avec badges de statut et liens vers le détail.
+* `template/copies/show.php` : fiche détaillée d'une copie affichant note brute, dates, statut de pénalité et note finale.
+* `template/error/404.php` & `error.php` : pages d'erreurs avec codes HTTP appropriés.
+
+Toutes les données affichées dans les vues sont protégées contre les failles XSS via `htmlspecialchars`.
+
+### PARTIE 9 — Contrôleur MVC
+
+# Rôle de CopieExamenController
+Le contrôleur `CopieExamenController` assure le pont entre les requêtes HTTP de l'utilisateur et la logique applicative :
+* `create()` : prépare et affiche la vue du formulaire.
+* `store()` : récupère les données de `$_POST`, construit le DTO `SoumettreCopieDTO`, gère les exceptions (erreurs de validation avec code HTTP 422), sollicite le service applicatif et redirige.
+* `index()` : sollicite le Repository pour récupérer toutes les copies et les transmet à la vue liste.
+* `show(int $id)` : recherche une copie par son identifiant et gère le cas non trouvé (HTTP 404).
+
+### PARTIE 10 — Routeur HTTP
+
+# Fonctionnement du Routeur
+La classe `Router` (`src/Router/Router.php`) offre un routage dynamique :
+* Enregistrement des routes avec `get()` et `post()`.
+* Extraction automatique des paramètres d'URL dynamiques (ex: `/copies/{id}`).
+* Exécution des actions de contrôleur correspondantes.
+* Gestion des routes non trouvées (erreur 404 automatique).
+
+Routes configurées dans `public/index.php` :
+* `GET /` : Redirection vers `/copies`.
+* `GET /copies` : Liste de toutes les copies.
+* `GET /copies/create` : Affichage du formulaire de soumission.
+* `POST /copies` : Traitement de la soumission d'une copie.
+* `GET /copies/{id}` : Fiche détaillée d'une copie spécifique.

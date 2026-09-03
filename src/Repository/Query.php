@@ -50,4 +50,11 @@ abstract class Query
 
         return $this->query($sql, false);
     }
+
+    protected function getById(string $tableName,int $id): mixed
+    {
+        $sql = "SELECT * FROM $tableName WHERE id= :id";
+
+        return $this->executeQuery($sql,['id'=>$id]);
+    }
 }

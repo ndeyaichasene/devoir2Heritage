@@ -13,6 +13,31 @@ class CopieExamenController
         private CopieExamenRepositoryInterface $repository
     ) {}
 
+    public function index(): void
+    {
+        $copies = $this->repository->findAll();
+        $this->render('copies/index', [
+            'copies' => $copies
+        ]);
+    }
+
+    public function show(int $id): void
+    {
+        $copie = $this->repository->findById($id);
+
+        if ($copie === null) {
+            http_response_code(404);
+            $this->render('error/404', [
+                'message' => "La copie d'examen #{$id} est introuvable."
+            ]);
+            return;
+        }
+
+        $this->render('copies/show', [
+            'copie' => $copie
+        ]);
+    }
+
     public function create(array $errors = [], array $old = []): void
     {
         $this->render('copies/create', [

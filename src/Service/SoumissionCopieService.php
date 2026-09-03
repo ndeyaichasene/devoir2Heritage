@@ -6,22 +6,21 @@ use App\DTO\SoumettreCopieDTO;
 use App\Entity\CopieExamen;
 use App\Repository\PdoCopieExamenRepository;
 
-class SoumissionCopieService
+final class SoumissionCopieService
 {
     public function __construct(
-        private CalculNoteInterface $strategie,
-        private PdoCopieExamenRepository $repository
+        private readonly PdoCopieExamenRepository $repository
     ) {}
 
-    public function soumettre(SoumettreCopieDTO $dto)
+    public function soumettre(CalculNoteInterface $strategie,SoumettreCopieDTO $dto)
     {
         $noteBrute = $dto->noteBrute;
         $dateDepot = $dto->dateDepot;
         $dateLimite = $dto->dateLimite;
 
-        $estEnRetard = $this->strategie->estEnRetard($dateDepot, $dateLimite);
+        $estEnRetard = $strategie->estEnRetard($dateDepot, $dateLimite);
 
-        $noteFinale = $this->strategie->calculerNote(
+        $noteFinale = $strategie->calculerNote(
             $noteBrute,
             $estEnRetard
         );

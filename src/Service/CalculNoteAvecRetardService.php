@@ -2,19 +2,19 @@
 
 namespace App\Service;
 
-
-
 class CalculNoteAvecRetardService implements CalculNoteInterface{
     
-    public function calculerNote(float $noteBrute, \DateTime $dateDepot, \DateTime $dateLimite): float
+    public function estEnRetard(\DateTime $dateDepot, \DateTime $dateLimite): bool
     {
-        if ($dateDepot > $dateLimite) {
-           $noteFinale = max(0,$noteBrute - 2);
-        }else {
-            $noteFinale = $noteBrute;
-        }
-
-        return $noteFinale;
+        return $dateDepot > $dateLimite;
     }
+
+    public function calculerNote(float $noteBrute, bool $estEnRetard): float
+    {
+        if (! $estEnRetard) {
+            return $noteFinale = $noteBrute;
+        }
+        return $noteFinale = max(0, $noteBrute - 2);
+    }    
 
 }

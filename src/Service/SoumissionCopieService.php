@@ -19,13 +19,14 @@ class SoumissionCopieService
         $dateDepot = $dto->dateDepot;
         $dateLimite = $dto->dateLimite;
 
+        $estEnRetard = $this->strategie->estEnRetard($dateDepot, $dateLimite);
+
         $noteFinale = $this->strategie->calculerNote(
             $noteBrute,
-            $dateDepot,
-            $dateLimite
+            $estEnRetard
         );
 
-        $penaliteAppliquee = $noteFinale < $noteBrute;
+        $penaliteAppliquee = $estEnRetard;
 
         $copieExamen = new CopieExamen(
             noteBrute: $noteBrute,

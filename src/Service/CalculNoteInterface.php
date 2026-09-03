@@ -3,9 +3,6 @@
 namespace App\Service;
 
 interface CalculNoteInterface{
-    public function calculerNote( 
-        float $noteBrute,
-        \DateTime $dateDepot,
-        \DateTime $dateLimite
-    ):float;
+    public function estEnRetard(\DateTime $dateDepot, \DateTime $dateLimite): bool;
+    public function calculerNote(float $noteBrute, bool $estEnRetard): float;
 }

@@ -48,11 +48,25 @@ class CopieExamenController
 
     public function store(): void
     {
-        $dto = SoumettreCopieDTO::fromArray($_POST);
-        $this->service->soumettre($dto);
+        try {
+            $dto = SoumettreCopieDTO::fromArray($_POST);
+            $copie = $this->service->soumettre($dto);
 
-        header('Location: /copies');
-        exit;
+            $redirectUrl = $copie->getId() ? '/copies/' . $copie->getId() : '/copies';
+            header("Location: {$redirectUrl}");
+            exit;
+        } catch (\InvalidArgumentException $e) {
+            http_response_code(422);
+            $this->create(
+                errors: [$e->getMessage()],
+                old: $_POST
+            );
+        } catch (\Throwable $e) {
+            http_response_code(500);
+            $this->render('error/error', [
+                'message' => "Une erreur inattendue est survenue : " . $e->getMessage()
+            ]);
+        }
     }
 
     private function render(string $view, array $data = []): void

@@ -39,8 +39,18 @@ class Router
         $requestMethod = strtoupper($method);
 
         foreach ($this->routes as $route) {
-            if ($route['method'] === $requestMethod && $route['path'] === $requestPath) {
-                return $this->executeHandler($route['handler']);
+            if ($route['method'] !== $requestMethod) {
+                continue;
+            }
+
+            $pattern = preg_replace('/\{([a-zA-Z_][a-zA-Z0-9_-]*)\}/', '(?P<$1>[^/]+)', $route['path']);
+            $regex = '#^' . $pattern . '$#';
+
+            if (preg_match($regex, $requestPath, $matches)) {
+                $params = array_filter($matches, fn($key) => !is_int($key), ARRAY_FILTER_USE_KEY);
+                $params = array_map(fn($val) => is_numeric($val) ? (int)$val : $val, $params);
+
+                return $this->executeHandler($route['handler'], $params);
             }
         }
 

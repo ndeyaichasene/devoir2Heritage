@@ -4,12 +4,13 @@ namespace App\Service;
 
 use App\DTO\SoumettreCopieDTO;
 use App\Entity\CopieExamen;
+use App\Repository\CopieExamenRepositoryInterface;
 use App\Repository\PdoCopieExamenRepository;
 
 final class SoumissionCopieService
 {
     public function __construct(
-        private readonly PdoCopieExamenRepository $repository
+        private readonly CopieExamenRepositoryInterface $repository
     ) {}
 
     public function soumettre(CalculNoteInterface $strategie,SoumettreCopieDTO $dto)

@@ -17,8 +17,8 @@ new Bootstrap();
 $pdo = Database::getInstance()->getConnexion();
 $repository = new PdoCopieExamenRepository($pdo);
 $strategie = new CalculNoteAvecRetardService();
-$service = new SoumissionCopieService($strategie, $repository);
-$controller = new CopieExamenController($service, $repository);
+$service = new SoumissionCopieService($repository);
+$controller = new CopieExamenController($service, $repository, $strategie);
 
 // 3. Configuration du routeur
 $router = new Router();

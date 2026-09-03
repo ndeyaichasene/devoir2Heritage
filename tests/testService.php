@@ -14,7 +14,7 @@ new Bootstrap();
 $pdo = Database::getInstance()->getConnexion();
 $repository = new PdoCopieExamenRepository($pdo);
 $strategie = new CalculNoteAvecRetardService();
-$service = new SoumissionCopieService($strategie, $repository);
+$service = new SoumissionCopieService($repository);
 
 $dto = SoumettreCopieDTO::fromArray([
     'note_brute' => 16.0,
@@ -22,7 +22,7 @@ $dto = SoumettreCopieDTO::fromArray([
     'date_limite' => '2026-09-03 12:00:00'
 ]);
 
-$copie = $service->soumettre($dto);
+$copie = $service->soumettre($strategie, $dto);
 
 echo "Copie soumise avec succès !\n";
 echo "Note brute : " . $copie->getNoteBrute() . "\n";

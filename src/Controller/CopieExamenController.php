@@ -4,14 +4,21 @@ namespace App\Controller;
 
 use App\DTO\SoumettreCopieDTO;
 use App\Repository\CopieExamenRepositoryInterface;
+use App\Service\CalculNoteAvecRetardService;
+use App\Service\CalculNoteInterface;
 use App\Service\SoumissionCopieService;
 
 class CopieExamenController
 {
+    private CalculNoteInterface $strategie;
+
     public function __construct(
         private SoumissionCopieService $service,
-        private CopieExamenRepositoryInterface $repository
-    ) {}
+        private CopieExamenRepositoryInterface $repository,
+        ?CalculNoteInterface $strategie = null
+    ) {
+        $this->strategie = $strategie ?? new CalculNoteAvecRetardService();
+    }
 
     public function index(): void
     {
@@ -26,7 +33,9 @@ class CopieExamenController
         $copie = $this->repository->findById($id);
 
         if ($copie === null) {
-            http_response_code(404);
+            if (!headers_sent()) {
+                http_response_code(404);
+            }
             $this->render('error/404', [
                 'message' => "La copie d'examen #{$id} est introuvable."
             ]);
@@ -50,19 +59,23 @@ class CopieExamenController
     {
         try {
             $dto = SoumettreCopieDTO::fromArray($_POST);
-            $copie = $this->service->soumettre($dto);
+            $copie = $this->service->soumettre($this->strategie, $dto);
 
             $redirectUrl = $copie->getId() ? '/copies/' . $copie->getId() : '/copies';
             header("Location: {$redirectUrl}");
             exit;
         } catch (\InvalidArgumentException $e) {
-            http_response_code(422);
+            if (!headers_sent()) {
+                http_response_code(422);
+            }
             $this->create(
                 errors: [$e->getMessage()],
                 old: $_POST
             );
         } catch (\Throwable $e) {
-            http_response_code(500);
+            if (!headers_sent()) {
+                http_response_code(500);
+            }
             $this->render('error/error', [
                 'message' => "Une erreur inattendue est survenue : " . $e->getMessage()
             ]);

@@ -5,6 +5,8 @@ namespace App\Router;
 class Router
 {
     private array $routes = [];
+    /** @var callable|null */
+    private $notFoundHandler = null;
 
     public function add(string $method, string $path, callable|array $handler): self
     {
@@ -25,6 +27,12 @@ class Router
     public function post(string $path, callable|array $handler): self
     {
         return $this->add('POST', $path, $handler);
+    }
+
+    public function setNotFoundHandler(callable $handler): self
+    {
+        $this->notFoundHandler = $handler;
+        return $this;
     }
 
     public function getRoutes(): array
@@ -54,6 +62,27 @@ class Router
             }
         }
 
+        return $this->handleNotFound();
+    }
+
+    protected function handleNotFound(): mixed
+    {
+        if (!headers_sent()) {
+            http_response_code(404);
+        }
+
+        if ($this->notFoundHandler !== null) {
+            return call_user_func($this->notFoundHandler);
+        }
+
+        $viewPath = dirname(__DIR__, 2) . '/template/error/404.php';
+        if (file_exists($viewPath)) {
+            $message = "La page demandée n'existe pas ou a été déplacée (Erreur 404).";
+            require $viewPath;
+            return null;
+        }
+
+        echo "404 Not Found";
         return null;
     }
 

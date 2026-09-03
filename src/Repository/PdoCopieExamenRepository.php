@@ -13,8 +13,8 @@ class PdoCopieExamenRepository extends Query implements CopieExamenRepositoryInt
     }
     public function save(CopieExamen $copieExamen):void{
         $sql = "INSERT INTO copies (dateDepot, noteBrute,noteFinale, penaliteAppliquee, dateLimite)
-                VALUES (:dateDepot,:noteBrute,:noteFinale,:penaliteAppliquee,:dateLimite)
-        ";
+                VALUES (:dateDepot,:noteBrute,:noteFinale,:penaliteAppliquee,:dateLimite)";
+                
         $params = [
             'dateDepot'=>$copieExamen->getDateDepot()->format('Y-m-d H:i:s'),
             'noteBrute'=>$copieExamen->getNoteBrute(),
